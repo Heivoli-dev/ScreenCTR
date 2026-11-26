@@ -1,5 +1,6 @@
 /* ScreenCTR console — Copyright (C) 2026 Heivoli Network — GPL-3.0-or-later */
 #include "sysutil.h"
+#include "csvc.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>

@@ -3,12 +3,9 @@
  * by the author) so the sysmodule's own C can be syntax/type checked on a PC.
  * This is NOT a 3DS build and proves nothing about runtime behaviour. */
 #pragma once
-#include <stdint.h>
+#include "3ds/types.h"
 #include <stdbool.h>
 #include <stddef.h>
-typedef uint8_t u8; typedef uint16_t u16; typedef uint32_t u32; typedef uint64_t u64;
-typedef int8_t s8; typedef int16_t s16; typedef int32_t s32; typedef int64_t s64;
-typedef volatile u32 vu32; typedef s32 Result; typedef u32 Handle;
 #define R_FAILED(r) ((r) < 0)
 #define R_SUCCEEDED(r) ((r) >= 0)
 #define CUR_PROCESS_HANDLE 0xFFFF8001
@@ -21,7 +18,6 @@ typedef struct { GSPGPU_CaptureInfoEntry screencapture[2]; } GSPGPU_CaptureInfo;
 typedef struct { s8 deviceId; s8 allowedAlignments; s16 burstSize, transferSize, burstStride, transferStride; } DmaDeviceConfig;
 typedef struct { s8 channelId; s8 endianSwapSize; u8 flags; u8 _padding; DmaDeviceConfig dstCfg, srcCfg; } DmaConfig;
 typedef enum { DMASTATE_STARTING=0, DMASTATE_WFP_DST, DMASTATE_WFP_SRC, DMASTATE_RUNNING, DMASTATE_DONE, DMASTATE_CANCELLED } DmaState;
-typedef enum { PROCESSOP_SCHEDULE_THREADS = 7 } ProcessOp;
 typedef struct { u64 programId; u8 mediaType; u8 padding[7]; } FS_ProgramInfo;
 typedef struct { int x; } *Thread; typedef void (*ThreadFunc)(void *);
 typedef struct { s32 v; } LightLock;
@@ -29,10 +25,10 @@ enum { MEMOP_ALLOC = 3 }; enum { MEMPERM_READ = 1, MEMPERM_WRITE = 2 };
 enum { GFX_TOP = 0 }; enum { KEY_START = 8 };
 Result svcControlMemory(u32*,u32,u32,u32,u32,u32); Result svcOpenProcess(Handle*,u32); Result svcCloseHandle(Handle);
 Result svcGetProcessList(s32*,u32*,s32); Result svcGetProcessInfo(s64*,Handle,u32); Result svcSendSyncRequest(Handle);
-Result svcControlProcess(Handle,ProcessOp,u32,u32); Result svcStartInterProcessDma(Handle*,Handle,u32,Handle,u32,u32,const DmaConfig*);
-Result svcGetDmaState(DmaState*,Handle); Result svcStopDma(Handle); Result svcInvalidateProcessDataCache(Handle,void*,u32);
-Result svcFlushProcessDataCache(Handle,const void*,u32); Result svcMapProcessMemoryEx(Handle,u32,Handle,u32,u32,u32);
-Result svcUnmapProcessMemoryEx(Handle,u32,u32); void svcSleepThread(s64); u64 svcGetSystemTick(void);
+Result svcStartInterProcessDma(Handle*,Handle,u32,Handle,u32,u32,const DmaConfig*);
+Result svcGetDmaState(DmaState*,Handle); Result svcStopDma(Handle); Result svcInvalidateProcessDataCache(Handle,u32,u32);
+Result svcFlushProcessDataCache(Handle,u32,u32);
+void svcSleepThread(s64); u64 svcGetSystemTick(void);
 Result svcWaitSynchronization(Handle,s64);
 u32 *getThreadCommandBuffer(void); u64 osGetTime(void);
 void dmaConfigInitDefault(DmaConfig*); Result GSPGPU_ImportDisplayCaptureInfo(GSPGPU_CaptureInfo*);

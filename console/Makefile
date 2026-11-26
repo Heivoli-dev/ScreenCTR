@@ -20,7 +20,8 @@ LDFLAGS  := -specs=3dsx.specs -g $(ARCH) -Wl,--gc-sections -Wl,-Map,$(BUILD)/$(T
 LIBS     := -L$(CTRULIB)/lib -lctru -lm
 
 CFILES   := $(foreach d,$(SOURCES),$(wildcard $(d)/*.c))
-OFILES   := $(patsubst %.c,$(BUILD)/%.o,$(notdir $(CFILES)))
+SFILES   := $(foreach d,$(SOURCES),$(wildcard $(d)/*.s))
+OFILES   := $(patsubst %.c,$(BUILD)/%.o,$(notdir $(CFILES))) $(patsubst %.s,$(BUILD)/%.o,$(notdir $(SFILES)))
 VPATH    := $(SOURCES)
 
 .PHONY: all clean launcher
@@ -31,6 +32,9 @@ $(BUILD):
 
 $(BUILD)/%.o: %.c | $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: %.s | $(BUILD)
+	$(CC) -x assembler-with-cpp $(ARCH) -c $< -o $@
 
 $(BUILD)/$(TARGET).elf: $(OFILES)
 	$(CC) $(LDFLAGS) $^ $(LIBS) -o $@

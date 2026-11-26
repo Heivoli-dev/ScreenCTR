@@ -4,6 +4,7 @@
  * Same principle as HzMod / ChirunoMod (GPLv3). */
 #include "capture.h"
 #include "sysutil.h"
+#include "csvc.h"
 
 #define VRAM_BEGIN 0x1F000000u
 #define VRAM_END   0x1F600000u
@@ -51,7 +52,7 @@ Result capture_copy(const fb_desc *fb, u32 owner_pid, void *dst, u32 dst_cap)
         svcCloseHandle(dma);
     }
     if (owned) svcCloseHandle(owned);
-    if (R_SUCCEEDED(r)) svcInvalidateProcessDataCache(CUR_PROCESS_HANDLE, dst, size);
+    if (R_SUCCEEDED(r)) svcInvalidateProcessDataCache(CUR_PROCESS_HANDLE, (u32)dst, size);
     return r;
 }
 
@@ -72,7 +73,7 @@ void *capture_map_for_write(const fb_desc *fb, u32 owner_pid)
 void capture_unmap_for_write(const fb_desc *fb, void *ptr)
 {
     u32 size = fb->stride * fb->rows;
-    svcFlushProcessDataCache(CUR_PROCESS_HANDLE, ptr, size);
+    svcFlushProcessDataCache(CUR_PROCESS_HANDLE, (u32)ptr, size);
     if (fb->in_vram) return;
     u32 off = fb->va & 0xFFF;
     u32 len = (off + size + 0xFFF) & ~0xFFFu;

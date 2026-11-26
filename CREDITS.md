@@ -4,7 +4,9 @@
 Licence : GPL-3.0-or-later (voir `LICENSE`).
 
 ScreenCTR est écrit de zéro. Les projets suivants ont été étudiés pour comprendre les
-mécanismes du système 3DS ; aucun code n'en a été copié dans cette version.
+mécanismes du système 3DS. Seule exception : `console/source/csvc.s` reprend (réduits)
+les wrappers d'appels système étendus de Luma3DS (`rosalina/source/csvc.s`, licence
+permissive de type zlib, notice conservée).
 
 - **Luma3DS / Rosalina** (LumaTeam, GPLv3) — protocole et fonctionnement
   d'InputRedirection (port 4950, valeurs neutres), SVC étendus (`svcControlProcess`,

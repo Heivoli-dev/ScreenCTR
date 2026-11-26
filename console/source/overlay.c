@@ -32,7 +32,7 @@ bool overlay_open(u32 owner)
     g.rgb = malloc(OW * OH * 3);
     g.ptr = g.backup && g.rgb ? capture_map_for_write(&g.fb, owner) : NULL;
     if (!g.ptr) { free(g.backup); free(g.rgb); g.backup = g.rgb = NULL; return false; }
-    svcInvalidateProcessDataCache(CUR_PROCESS_HANDLE, g.ptr, size);
+    svcInvalidateProcessDataCache(CUR_PROCESS_HANDLE, (u32)g.ptr, size);
     memcpy(g.backup, g.ptr, size);
     /* Start from a dimmed copy of the game picture */
     sc_fb_to_rgb(g.ptr, (int)g.fb.format, (int)g.fb.stride, OW, OH, g.rgb);
@@ -86,7 +86,7 @@ void overlay_present(void)
 {
     if (!g.open) return;
     sc_rgb_to_fb(g.rgb, OW, OH, (int)g.fb.format, (int)g.fb.stride, g.ptr);
-    svcFlushProcessDataCache(CUR_PROCESS_HANDLE, g.ptr, g.fb.stride * g.fb.rows);
+    svcFlushProcessDataCache(CUR_PROCESS_HANDLE, (u32)g.ptr, g.fb.stride * g.fb.rows);
 }
 
 void overlay_close(void)
