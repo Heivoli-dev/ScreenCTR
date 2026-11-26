@@ -1,0 +1,16 @@
+# console
+console/build/
+console/*.cia
+console/launcher/build/
+console/launcher/*.3dsx
+console/launcher/*.smdh
+console/launcher/*.elf
+# pc
+pc/build*/
+build*/
+*.user
+# misc
+__pycache__/
+*.mp4
+*.ppm
+/out/
