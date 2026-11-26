@@ -53,7 +53,7 @@ AccessControlInfo:
   IORegisterMapping:
     - 1ec46000                             # HID_PAD page (physical buttons, hotkey)
   MemoryMapping:
-    - 1f000000-1f600000                    # VRAM (framebuffers + overlay)
+    - 1f000000-1f5fffff                    # VRAM (end address is inclusive) (framebuffers + overlay)
 
   SystemCallAccess:
     ControlMemory: 1
