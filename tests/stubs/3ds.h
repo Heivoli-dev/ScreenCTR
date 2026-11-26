@@ -41,3 +41,4 @@ Thread threadCreate(ThreadFunc,void*,size_t,int,int,bool); Result threadJoin(Thr
 void LightLock_Init(LightLock*); void LightLock_Lock(LightLock*); void LightLock_Unlock(LightLock*);
 void gfxInitDefault(void); void gfxExit(void); void *consoleInit(int, void*); void nsInit(void); void nsExit(void);
 Result NS_LaunchTitle(u64,u32,u32*); bool aptMainLoop(void); void hidScanInput(void); u32 hidKeysDown(void); void gspWaitForVBlank(void);
+Result hidInit(void); void hidExit(void); u32 hidKeysHeld(void);

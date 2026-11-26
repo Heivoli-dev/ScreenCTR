@@ -10,9 +10,7 @@
 void sc_log(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 static inline u64 now_ms(void) { return osGetTime(); }
 
-/* Physical buttons, read straight from the HID I/O register (mapped through
- * the exheader). Remote input redirected by Rosalina never shows up here, so
- * the PC cannot open the ScreenCTR menu or answer its prompts. Active high. */
+/* Held buttons (bits 0..11, active high) from the HID service. */
 u32  hid_physical_buttons(void);
 
 /* Process helpers (Luma3DS extended SVCs) */

@@ -50,8 +50,6 @@ AccessControlInfo:
   RunnableOnSleep         : true
   SpecialMemoryArrange    : true
 
-  IORegisterMapping:
-    - 1ec46000                             # HID_PAD page (physical buttons, hotkey)
   MemoryMapping:
     - 1f000000-1f5fffff                    # VRAM (end address is inclusive) (framebuffers + overlay)
 
@@ -125,6 +123,8 @@ AccessControlInfo:
 
   InterruptNumbers:
   ServiceAccessControl:
+    - hid:USER
+    - hid:SPVR
     - fs:USER
     - gsp::Gpu
     - soc:U
@@ -144,3 +144,4 @@ SystemControlInfo:
     ac: 0x0004013000002402
     pm: 0x0004013000001202
     cfg: 0x0004013000001702
+    hid: 0x0004013000001D02

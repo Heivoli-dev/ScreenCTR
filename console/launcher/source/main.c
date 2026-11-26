@@ -36,7 +36,21 @@ int main(void)
         if (R_SUCCEEDED(r)) printf("ScreenCTR demarre (PID %lu).\n", pid);
         else printf("\x1b[31mEchec du demarrage : %08lX\x1b[0m\nScreenCTR.cia est-il installe ?\n", r);
     }
-    printf("\nOuvrez un jeu puis appuyez sur L+R+START\npour afficher le menu ScreenCTR.\n\nSTART : retour au menu HOME\n");
+    /* Diagnostics: is the sysmodule alive, and what did it log? */
+    svcSleepThread(1500000000LL);
+    printf("\nEtat : %s\n", is_running() ? "\x1b[32mScreenCTR tourne en arriere-plan\x1b[0m"
+                                          : "\x1b[31mScreenCTR ne tourne PAS (arret au demarrage ?)\x1b[0m");
+    FILE *f = fopen("sdmc:/3ds/ScreenCTR/log.txt", "r");
+    if (!f) printf("Pas de log.txt (sd:/3ds/ScreenCTR/)\n");
+    else {
+        static char lines[10][100]; int n = 0;
+        char buf[100];
+        while (fgets(buf, sizeof buf, f)) { strncpy(lines[n % 10], buf, 99); n++; }
+        fclose(f);
+        printf("--- fin de log.txt ---\n");
+        for (int i = n > 10 ? n - 10 : 0; i < n; i++) printf("%.49s", lines[i % 10]), (strchr(lines[i % 10], '\n') ? 0 : printf("\n"));
+    }
+    printf("\nOuvrez un jeu puis L+R+START.\nSTART : quitter\n");
     while (aptMainLoop()) {
         hidScanInput();
         if (hidKeysDown() & KEY_START) break;

@@ -22,11 +22,15 @@ void sc_log(const char *fmt, ...)
     LightLock_Unlock(&g_logLock);
 }
 
-/* HID_PAD register: physical 0x10146000, mapped at VA 0x1EC46000 (same VA
- * Rosalina's InputRedirection patches out of the HID module). Bits 0..11 are
- * active low. Requires "IORegisterMapping: 1EC46000" in the RSF. */
-#define HID_PAD_REG (*(vu32 *)0x1EC46000)
-u32 hid_physical_buttons(void) { return (~HID_PAD_REG) & 0xFFF; }
+/* Same method as Rosalina's menu thread: hidInit() once (in __appInit), then
+ * hidScanInput() + hidKeysHeld(). Bits 0..11 match SC_BTN_* (KEY_A..KEY_Y).
+ * Note: with Rosalina InputRedirection active, remote buttons are included;
+ * ScreenCTR ignores remote input while its menu is open. */
+u32 hid_physical_buttons(void)
+{
+    hidScanInput();
+    return hidKeysHeld() & 0xFFF;
+}
 
 Result proc_find_by_name(const char *name, u32 *pid)
 {

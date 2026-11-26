@@ -49,6 +49,7 @@ void __system_allocateHeaps(void)
 void __appInit(void)
 {
     srvInit();
+    hidInit();
     fsInit();
     archiveMountSdmc();
     gspInit();
@@ -63,6 +64,7 @@ void __appExit(void)
     gspExit();
     archiveUnmountAll();
     fsExit();
+    hidExit();
     srvExit();
 }
 
@@ -403,7 +405,11 @@ static void keys_tick(void)
     M.prev_keys = k;
 
     if (M.st == M_CLOSED) {
-        if ((k & g_cfg.hotkey) == g_cfg.hotkey && (down & g_cfg.hotkey)) { M.msg[0] = 0; menu_open(M_MAIN); }
+        if ((k & g_cfg.hotkey) == g_cfg.hotkey && (down & g_cfg.hotkey)) {
+            sc_log("hotkey pressed (keys=%03lX)", k);
+            M.msg[0] = 0; menu_open(M_MAIN);
+            sc_log("menu %s, game %s", overlay_is_open() ? "shown" : "NOT shown", M.paused ? "paused" : "running");
+        }
         return;
     }
     if (M.st == M_MAIN) {
@@ -470,6 +476,7 @@ static void net_close(void)
 int main(void)
 {
     sc_log("ScreenCTR " SC_VERSION_STR " starting");
+    sc_log("hid check: held=%03lX (should be 000 with no button pressed)", hid_physical_buttons());
     config_load();
     srand((unsigned)svcGetSystemTick());
     if (!stream_alloc()) { sc_log("out of memory"); return 1; }
