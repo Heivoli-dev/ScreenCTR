@@ -29,10 +29,16 @@ jobs:
           mkdir -p tools-bin
           gh release download -R 3DSGuy/Project_CTR --pattern "makerom-*ubuntu*" -D tools-bin
           cd tools-bin && unzip -o makerom-*.zip && chmod +x makerom
-      - name: Build sysmodule (.cia) and launcher (.3dsx)
+      - name: Compile sysmodule ELF and launcher (.3dsx) with devkitARM
         run: |
-          docker run --rm -v "$PWD:/src" -w /src/console -e PATH="/src/tools-bin:/opt/devkitpro/tools/bin:/opt/devkitpro/devkitARM/bin:/usr/bin:/bin" \
-            devkitpro/devkitarm bash -c "make && make launcher"
+          docker run --rm -v "$PWD:/src" -w /src/console devkitpro/devkitarm \
+            bash -c "make build/ScreenCTR.elf && make launcher && chown -R $(id -u):$(id -g) /src/console"
+      - name: Package sysmodule (.cxi -> .cia) with makerom on the host
+        # makerom's Linux build needs a newer glibc than the devkitarm image ships
+        run: |
+          cd console
+          ../tools-bin/makerom -f ncch -rsf screenctr.rsf -nocodepadding -o build/ScreenCTR.cxi -elf build/ScreenCTR.elf
+          ../tools-bin/makerom -f cia -o ScreenCTR.cia -i build/ScreenCTR.cxi:0:0 -ignoresign
       - uses: actions/upload-artifact@v4
         with:
           name: ScreenCTR-console
