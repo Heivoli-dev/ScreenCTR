@@ -1,13 +1,13 @@
 # ScreenCTR — État d'avancement (itération 1)
 
 **Règle du projet : aucune fonctionnalité n'est déclarée fonctionnelle sans test.**
-Cette itération a été développée dans un environnement Linux **sans devkitARM, sans Qt 6,
-sans SDL3, sans compilateur Windows et sans console**. Tout ce qui dépend de ces outils
-est écrit mais **non compilé et non testé**.
+Le code a été développé sans console. Depuis la mise en ligne sur GitHub, la CI compile
+la partie console (devkitARM + makerom) et l'application Windows (MSVC, Qt 6.7, SDL3) :
+**tout compile**, mais **rien n'a encore été exécuté sur une console ni sur Windows**.
 
 Légende :
 - ✅ **Testé** — exécuté ici, tests automatisés reproductibles (`scripts/run_tests.sh`).
-- 🟡 **Écrit, non compilé** — code complet, jamais passé par son vrai compilateur.
+- 🟡 **Compilé, non testé** — compile dans la CI GitHub, jamais exécuté sur le vrai matériel.
 - 🔴 **Non fait**.
 
 ## Ce qui est testé
@@ -30,16 +30,16 @@ Légende :
 Mesure indicative (PC x86, **non représentative de l'ARM11**) : conversion + encodage
 d'un écran 400×240 en 1,6 ms.
 
-## Ce qui est écrit mais pas encore compilé / testé
+## Ce qui compile mais n'est pas encore testé
 
 | Composant | Fichiers | Ce qui doit être vérifié |
 |---|---|---|
-| 🟡 Sysmodule 3DS | `console/source/*` | Compilation devkitARM ; voir le plan de test matériel |
-| 🟡 Lanceur 3DS | `console/launcher/` | Compilation ; `NS_LaunchTitle` depuis le Homebrew Launcher |
-| 🟡 RSF (droits du sysmodule) | `console/screenctr.rsf` | Catégorie, accès core 2, mappage VRAM / registre HID, SVC Luma |
-| 🟡 Application Windows Qt 6 | `pc/src/*` | Compilation MSVC, fonctionnement réel |
+| 🟡 Sysmodule 3DS | `console/source/*` | Compile (`ScreenCTR.cia`) ; voir le plan de test matériel |
+| 🟡 Lanceur 3DS | `console/launcher/` | Compile ; `NS_LaunchTitle` depuis le Homebrew Launcher |
+| 🟡 RSF (droits du sysmodule) | `console/screenctr.rsf` | Accepté par makerom ; à valider : core 2, mappages, SVC Luma |
+| 🟡 Application Windows Qt 6 | `pc/src/*` | Compile avec MSVC ; fonctionnement réel à tester |
 | 🟡 Manettes SDL3 | `pc/src/GamepadManager.cpp` | Xbox, DualShock 4, DualSense, génériques |
-| 🟡 CI GitHub | `.github/workflows/build.yml` | Premier passage (versions d'outils) |
+| ✅ CI GitHub | `.github/workflows/build.yml` | Tests + compilation console + Windows au vert |
 
 ## Hypothèses techniques à valider sur la New 2DS XL (par ordre de risque)
 
@@ -81,4 +81,4 @@ d'un écran 400×240 en 1,6 ms.
 | 10 | Dispositions personnalisables | 🟡 / ✅ calculs |
 | 11 | Captures et enregistrements | 🟡 / ✅ FFmpeg |
 | 12 | Optimisation | 🔴 nécessite des mesures sur console |
-| 13 | Fichiers d'installation | 🟡 scripts + CI, aucun binaire produit |
+| 13 | Fichiers d'installation | 🟡 la CI produit `ScreenCTR.cia`, le lanceur et le dossier Windows (non testés) |
