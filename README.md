@@ -18,11 +18,11 @@ Version de développement, compilée automatiquement — **pas encore validée s
 | | |
 |---|---|
 | **Windows** | [ScreenCTR-Windows.zip](https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR-Windows.zip) → décompresser → `ScreenCTR\ScreenCTR.exe` |
-| **Console** | [ScreenCTR.cia](https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR.cia) + [ScreenCTR-Launcher.3dsx](https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR-Launcher.3dsx) (dans `sd:/3ds/`) |
+| **Console** | [ScreenCTR.cia](https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR.cia) (module) + [ScreenCTR-Launcher.cia](https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR-Launcher.cia) (icône du menu HOME) |
 
-Installation du `.cia` avec FBI : **Remote Install → Scan QR Code**
+Installation avec FBI : **Remote Install → Scan QR Code**, les deux codes l'un après l'autre, puis lancez **ScreenCTR** depuis le menu HOME.
 
-<img src="https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR-cia-QR.png" width="240" alt="QR code ScreenCTR.cia">
+<img src="https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR-cia-QR.png" width="220" alt="QR 1 : ScreenCTR.cia"> <img src="https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR-Launcher-cia-QR.png" width="220" alt="QR 2 : ScreenCTR-Launcher.cia">
 
 ## Fonctionnement
 ```

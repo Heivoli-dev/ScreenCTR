@@ -22,7 +22,7 @@ typedef struct { u64 programId; u8 mediaType; u8 padding[7]; } FS_ProgramInfo;
 typedef struct { int x; } *Thread; typedef void (*ThreadFunc)(void *);
 typedef struct { s32 v; } LightLock;
 enum { MEMOP_ALLOC = 3 }; enum { MEMPERM_READ = 1, MEMPERM_WRITE = 2 };
-enum { GFX_TOP = 0 }; enum { KEY_START = 8 };
+enum { GFX_TOP = 0 }; enum { KEY_A = 1, KEY_B = 2, KEY_START = 8 }; void consoleClear(void);
 Result svcControlMemory(u32*,u32,u32,u32,u32,u32); Result svcOpenProcess(Handle*,u32); Result svcCloseHandle(Handle);
 Result svcGetProcessList(s32*,u32*,s32); Result svcGetProcessInfo(s64*,Handle,u32); Result svcSendSyncRequest(Handle);
 Result svcStartInterProcessDma(Handle*,Handle,u32,Handle,u32,u32,const DmaConfig*);

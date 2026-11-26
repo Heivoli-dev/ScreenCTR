@@ -31,7 +31,10 @@ jobs:
         run: |
           mkdir -p tools-bin
           gh release download -R 3DSGuy/Project_CTR --pattern "makerom-*ubuntu*" -D tools-bin
-          cd tools-bin && unzip -o makerom-*.zip && chmod +x makerom
+          gh release download -R Steveice10/bannertool --pattern "bannertool*.zip" -D tools-bin
+          cd tools-bin && unzip -o makerom-*.zip && unzip -o bannertool*.zip -d bannertool
+          cp "$(find bannertool -path '*linux-x86_64*' -name bannertool -type f | head -1)" ./bannertool
+          chmod +x makerom bannertool
       - name: Compile sysmodule ELF and launcher (.3dsx) with devkitARM
         run: |
           docker run --rm -v "$PWD:/src" -w /src/console devkitpro/devkitarm \
@@ -42,12 +45,20 @@ jobs:
           cd console
           ../tools-bin/makerom -f ncch -rsf screenctr.rsf -nocodepadding -o build/ScreenCTR.cxi -elf build/ScreenCTR.elf
           ../tools-bin/makerom -f cia -o ScreenCTR.cia -i build/ScreenCTR.cxi:0:0 -ignoresign
+      - name: Package launcher as a HOME Menu CIA
+        run: |
+          cd console/launcher
+          ../../tools-bin/bannertool makebanner -i ../../assets/banner.png -a ../../assets/banner_silence.wav -o build/banner.bnr
+          ../../tools-bin/bannertool makesmdh -s "ScreenCTR" -l "Two screens. One connection." -p "Heivoli Network" -i ../../assets/icon48.png -o build/icon.icn
+          ../../tools-bin/makerom -f cia -o ScreenCTR-Launcher.cia -elf ScreenCTR-Launcher.elf -rsf launcher.rsf \
+            -icon build/icon.icn -banner build/banner.bnr -exefslogo -target t
       - uses: actions/upload-artifact@v4
         with:
           name: ScreenCTR-console
           path: |
             console/ScreenCTR.cia
             console/launcher/ScreenCTR-Launcher.3dsx
+            console/launcher/ScreenCTR-Launcher.cia
           if-no-files-found: error
 
   windows:
@@ -104,10 +115,12 @@ jobs:
           mkdir -p rel
           cp art/ScreenCTR-console/ScreenCTR.cia rel/
           cp art/ScreenCTR-console/launcher/ScreenCTR-Launcher.3dsx rel/
+          cp art/ScreenCTR-console/launcher/ScreenCTR-Launcher.cia rel/
           mv art/ScreenCTR-windows art/ScreenCTR
           (cd art && zip -qr ../rel/ScreenCTR-Windows.zip ScreenCTR)
           pip install --quiet qrcode[pil]
-          python3 tools/make_qr.py "https://github.com/${{ github.repository }}/releases/download/nightly/ScreenCTR.cia" rel/ScreenCTR-cia-QR.png
+          python3 tools/make_qr.py "https://github.com/${{ github.repository }}/releases/download/nightly/ScreenCTR.cia" rel/ScreenCTR-cia-QR.png "1. ScreenCTR.cia"
+          python3 tools/make_qr.py "https://github.com/${{ github.repository }}/releases/download/nightly/ScreenCTR-Launcher.cia" rel/ScreenCTR-Launcher-cia-QR.png "2. ScreenCTR-Launcher.cia"
           ls -la rel
       - name: Move the nightly tag to this commit
         run: |
@@ -123,6 +136,6 @@ jobs:
             Version compilée automatiquement depuis `main` (${{ github.sha }}).
             **Pas encore validée sur console** — voir docs/STATUS.md et docs/HARDWARE_TEST_PLAN.md.
 
-            - **Console** : dans FBI, « Remote Install » → « Scan QR Code », scannez `ScreenCTR-cia-QR.png`. Copiez aussi `ScreenCTR-Launcher.3dsx` dans `sd:/3ds/`.
+            - **Console** : dans FBI, « Remote Install » → « Scan QR Code », scannez `ScreenCTR-cia-QR.png` puis `ScreenCTR-Launcher-cia-QR.png`. Lancez ensuite **ScreenCTR** depuis le menu HOME (redémarrez la console après une mise à jour).
             - **Windows** : téléchargez `ScreenCTR-Windows.zip`, décompressez, lancez `ScreenCTR\ScreenCTR.exe`.
           files: rel/*

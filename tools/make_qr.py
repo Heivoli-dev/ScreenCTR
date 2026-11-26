@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Make a QR code PNG for FBI's "Remote Install > Scan QR Code".
-usage: make_qr.py <url> <out.png>   (needs: pip install qrcode[pil])"""
+usage: make_qr.py <url> <out.png> [caption]   (needs: pip install qrcode[pil])"""
 import sys
 import qrcode
 from PIL import ImageDraw, ImageFont
@@ -21,7 +21,7 @@ try:
     font = ImageFont.truetype("DejaVuSans-Bold.ttf", 22)
 except OSError:
     font = ImageFont.load_default()
-text = "ScreenCTR.cia (FBI)"
+text = sys.argv[3] if len(sys.argv) > 3 else "ScreenCTR.cia (FBI)"
 tw = d.textlength(text, font=font)
 d.text(((w - tw) / 2, h + 15), text, fill="black", font=font)
 final.save(out)

@@ -35,4 +35,23 @@ svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
 </svg>
 """
 (OUT / "logo.svg").write_text(svg)
+
+# HOME Menu banner (256x128, shown above the icon) + silent banner sound
+from PIL import ImageFont
+ban = Image.new("RGBA", (256, 128), BG + (255,))
+ban.paste(icon(96), (16, 16), icon(96))
+bd = ImageDraw.Draw(ban)
+try:
+    f1 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 22)
+    f2 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 11)
+except OSError:
+    f1 = f2 = ImageFont.load_default()
+bd.text((122, 36), "Screen", fill=FG, font=f1)
+bd.text((122 + bd.textlength("Screen", font=f1), 36), "CTR", fill=ACC, font=f1)
+bd.text((122, 68), "Two screens.", fill=(138, 147, 166), font=f2)
+bd.text((122, 83), "One connection.", fill=(138, 147, 166), font=f2)
+ban.save(OUT / "banner.png")
+import wave
+with wave.open(str(OUT / "banner_silence.wav"), "wb") as w:
+    w.setnchannels(2); w.setsampwidth(2); w.setframerate(32728); w.writeframes(b"\0\0\0\0" * 3272)
 print("assets written to", OUT)

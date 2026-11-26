@@ -475,6 +475,7 @@ static void net_close(void)
 /* ------------------------------------------------------------------ */
 int main(void)
 {
+    remove(SC_LOG_PATH); /* one log per boot: the launcher reads it */
     sc_log("ScreenCTR " SC_VERSION_STR " starting");
     sc_log("hid check: held=%03lX (should be 000 with no button pressed)", hid_physical_buttons());
     config_load();
@@ -496,7 +497,11 @@ int main(void)
         }
         u64 t = now_ms();
         if (!net_up && t >= net_retry) {
-            if (gethostid() != 0 && net_open()) { net_up = true; sc_log("listening on %u", g_cfg.port); }
+            if (gethostid() != 0 && net_open()) {
+                net_up = true;
+                char ip[20]; ip_str((u32)gethostid(), ip, sizeof ip);
+                sc_log("listening on %s:%u", ip, g_cfg.port);
+            }
             else { net_close(); net_retry = t + 2000; }
         }
 
