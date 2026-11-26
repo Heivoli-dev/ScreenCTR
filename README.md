@@ -12,6 +12,18 @@ une manette branchée au PC.
 > console ; le sysmodule et l'application Windows sont écrits mais pas encore compilés.
 > Détail exact : [`docs/STATUS.md`](docs/STATUS.md).
 
+## Téléchargement
+Version de développement, compilée automatiquement — **pas encore validée sur console**.
+
+| | |
+|---|---|
+| **Windows** | [ScreenCTR-Windows.zip](https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR-Windows.zip) → décompresser → `ScreenCTR\ScreenCTR.exe` |
+| **Console** | [ScreenCTR.cia](https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR.cia) + [ScreenCTR-Launcher.3dsx](https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR-Launcher.3dsx) (dans `sd:/3ds/`) |
+
+Installation du `.cia` avec FBI : **Remote Install → Scan QR Code**
+
+<img src="https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR-cia-QR.png" width="240" alt="QR code ScreenCTR.cia">
+
 ## Fonctionnement
 ```
  New 3DS (Luma3DS)                                     PC Windows

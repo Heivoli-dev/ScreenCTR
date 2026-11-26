@@ -8,6 +8,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write   # the release job publishes the "nightly" release
+
 jobs:
   tests:
     runs-on: ubuntu-24.04
@@ -45,6 +48,7 @@ jobs:
           path: |
             console/ScreenCTR.cia
             console/launcher/ScreenCTR-Launcher.3dsx
+          if-no-files-found: error
 
   windows:
     runs-on: windows-2022
@@ -67,7 +71,58 @@ jobs:
           cmake --build pc/build --config Release
           ctest --test-dir pc/build -C Release --output-on-failure
           cmake --install pc/build --config Release
+      - name: Bundle FFmpeg (MP4 recording works out of the box)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          Invoke-WebRequest https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip -OutFile ffmpeg.zip
+          Expand-Archive ffmpeg.zip -DestinationPath ffmpeg-tmp
+          Copy-Item (Get-ChildItem ffmpeg-tmp -Recurse -Filter ffmpeg.exe | Select-Object -First 1).FullName dist/ScreenCTR/ffmpeg.exe
+      - name: Licences
+        shell: pwsh
+        run: |
+          Copy-Item LICENSE dist/ScreenCTR/LICENSE.txt
+          Copy-Item CREDITS.md dist/ScreenCTR/CREDITS.md
       - uses: actions/upload-artifact@v4
         with:
           name: ScreenCTR-windows
           path: dist/ScreenCTR
+
+  # Rolling pre-release with stable direct links (used by the QR code / FBI):
+  #   https://github.com/Heivoli-dev/ScreenCTR/releases/download/nightly/ScreenCTR.cia
+  release:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [tests, console, windows]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: art
+      - name: Prepare files and QR code
+        run: |
+          mkdir -p rel
+          cp art/ScreenCTR-console/ScreenCTR.cia rel/
+          cp art/ScreenCTR-console/launcher/ScreenCTR-Launcher.3dsx rel/
+          mv art/ScreenCTR-windows art/ScreenCTR
+          (cd art && zip -qr ../rel/ScreenCTR-Windows.zip ScreenCTR)
+          pip install --quiet qrcode[pil]
+          python3 tools/make_qr.py "https://github.com/${{ github.repository }}/releases/download/nightly/ScreenCTR.cia" rel/ScreenCTR-cia-QR.png
+          ls -la rel
+      - name: Move the nightly tag to this commit
+        run: |
+          git tag -f nightly
+          git push -f origin nightly
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: ScreenCTR — version de développement (non testée sur console)
+          prerelease: true
+          make_latest: false
+          body: |
+            Version compilée automatiquement depuis `main` (${{ github.sha }}).
+            **Pas encore validée sur console** — voir docs/STATUS.md et docs/HARDWARE_TEST_PLAN.md.
+
+            - **Console** : dans FBI, « Remote Install » → « Scan QR Code », scannez `ScreenCTR-cia-QR.png`. Copiez aussi `ScreenCTR-Launcher.3dsx` dans `sd:/3ds/`.
+            - **Windows** : téléchargez `ScreenCTR-Windows.zip`, décompressez, lancez `ScreenCTR\ScreenCTR.exe`.
+          files: rel/*
