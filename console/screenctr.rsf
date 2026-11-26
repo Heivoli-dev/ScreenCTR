@@ -51,7 +51,7 @@ AccessControlInfo:
   SpecialMemoryArrange    : true
 
   IORegisterMapping:
-    - 1ec46000-1ec47000                    # HID_PAD (physical buttons, hotkey)
+    - 1ec46000                             # HID_PAD page (physical buttons, hotkey)
   MemoryMapping:
     - 1f000000-1f600000                    # VRAM (framebuffers + overlay)
 
