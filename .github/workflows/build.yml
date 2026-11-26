@@ -31,10 +31,26 @@ jobs:
         run: |
           mkdir -p tools-bin
           gh release download -R 3DSGuy/Project_CTR --pattern "makerom-*ubuntu*" -D tools-bin
-          gh release download -R Steveice10/bannertool --pattern "bannertool*.zip" -D tools-bin
-          cd tools-bin && unzip -o makerom-*.zip && unzip -o bannertool*.zip -d bannertool
-          cp "$(find bannertool -path '*linux-x86_64*' -name bannertool -type f | head -1)" ./bannertool
-          chmod +x makerom bannertool
+          cd tools-bin && unzip -o makerom-*.zip && chmod +x makerom
+      - name: Fetch or build bannertool (optional, HOME Menu banner)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd tools-bin
+          if gh release download -R carstene1ns/3ds-bannertool -D bt-rel 2>/dev/null; then
+            for z in bt-rel/*.zip; do unzip -o "$z" -d bt-rel/x >/dev/null || true; done
+            for t in bt-rel/*.tar*; do tar -xf "$t" -C bt-rel >/dev/null 2>&1 || true; done
+            f=$(find bt-rel -type f -name bannertool ! -path '*windows*' ! -path '*mac*' | head -1)
+            [ -n "$f" ] && cp "$f" ./bannertool
+          fi
+          if [ ! -x ./bannertool ] && [ ! -f ./bannertool ]; then
+            git clone --depth 1 --recursive https://github.com/carstene1ns/3ds-bannertool bt-src
+            if [ -f bt-src/CMakeLists.txt ]; then cmake -S bt-src -B bt-src/build -DCMAKE_BUILD_TYPE=Release && cmake --build bt-src/build -j4
+            else make -C bt-src -j4; fi
+            cp "$(find bt-src -type f -name bannertool -perm -u+x | head -1)" ./bannertool
+          fi
+          chmod +x bannertool && ./bannertool 2>&1 | head -3
       - name: Compile sysmodule ELF and launcher (.3dsx) with devkitARM
         run: |
           docker run --rm -v "$PWD:/src" -w /src/console devkitpro/devkitarm \
@@ -48,10 +64,15 @@ jobs:
       - name: Package launcher as a HOME Menu CIA
         run: |
           cd console/launcher
-          ../../tools-bin/bannertool makebanner -i ../../assets/banner.png -a ../../assets/banner_silence.wav -o build/banner.bnr
-          ../../tools-bin/bannertool makesmdh -s "ScreenCTR" -l "Two screens. One connection." -p "Heivoli Network" -i ../../assets/icon48.png -o build/icon.icn
+          BANNER=""
+          if [ -x ../../tools-bin/bannertool ] && ../../tools-bin/bannertool makebanner -i ../../assets/banner.png -a ../../assets/banner_silence.wav -o build/banner.bnr; then
+            BANNER="-banner build/banner.bnr"
+          else
+            echo "::warning::bannertool unavailable: CIA built without HOME Menu banner (icon still present)"
+          fi
+          # Icon: the SMDH produced by devkitPro's smdhtool during 'make launcher'
           ../../tools-bin/makerom -f cia -o ScreenCTR-Launcher.cia -elf ScreenCTR-Launcher.elf -rsf launcher.rsf \
-            -icon build/icon.icn -banner build/banner.bnr -exefslogo -target t
+            -icon ScreenCTR-Launcher.smdh $BANNER -exefslogo -target t
       - uses: actions/upload-artifact@v4
         with:
           name: ScreenCTR-console
