@@ -21,7 +21,7 @@ try:
     font = ImageFont.truetype("DejaVuSans-Bold.ttf", 22)
 except OSError:
     font = ImageFont.load_default()
-text = "ScreenCTR.cia — FBI > Remote Install > Scan QR Code"
+text = "ScreenCTR.cia (FBI)"
 tw = d.textlength(text, font=font)
 d.text(((w - tw) / 2, h + 15), text, fill="black", font=font)
 final.save(out)
