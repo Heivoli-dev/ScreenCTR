@@ -65,13 +65,26 @@ static Result apt_active_appid(u32 *active)
     return r;
 }
 
+/* pm:dbg command 0x100 "GetCurrentAppInfo": a Luma3DS extension of its PM
+ * reimplementation (not in libctru). Response: [1] result, [2..5] FS_ProgramInfo,
+ * [6] pid, [7] launch flags — as in Rosalina's pmdbgext.c. */
+static Result pmdbg_current_app_pid(u32 *pid)
+{
+    u32 *cmd = getThreadCommandBuffer();
+    cmd[0] = IPC_MakeHeader(0x100, 0, 0);
+    Result r = svcSendSyncRequest(*pmDbgGetSessionHandle());
+    if (R_FAILED(r)) return r;
+    if (R_SUCCEEDED((Result)cmd[1])) *pid = cmd[6];
+    return (Result)cmd[1];
+}
+
 Result proc_foreground(u32 *pid, bool *is_home_menu)
 {
     u32 active = 0;
     bool home = R_SUCCEEDED(apt_active_appid(&active)) && active == 0x101; /* APPID_HOMEMENU */
     if (!home) {
-        FS_ProgramInfo info; u32 apid = 0, flags = 0;
-        if (R_SUCCEEDED(PMDBG_GetCurrentAppInfo(&info, &apid, &flags)) && apid) {
+        u32 apid = 0;
+        if (R_SUCCEEDED(pmdbg_current_app_pid(&apid)) && apid) {
             *pid = apid; if (is_home_menu) *is_home_menu = false;
             return 0;
         }

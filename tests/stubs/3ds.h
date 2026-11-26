@@ -35,7 +35,7 @@ void dmaConfigInitDefault(DmaConfig*); Result GSPGPU_ImportDisplayCaptureInfo(GS
 Result srvInit(void); void srvExit(void); Result srvGetServiceHandle(Handle*,const char*); Result srvEnableNotification(Handle*); Result srvReceiveNotification(u32*);
 Result fsInit(void); void fsExit(void); Result archiveMountSdmc(void); Result archiveUnmountAll(void);
 void gspInit(void); void gspExit(void); Result pmDbgInit(void); void pmDbgExit(void);
-Result PMDBG_GetCurrentAppInfo(FS_ProgramInfo*,u32*,u32*); Result cfguInit(void); void cfguExit(void); Result CFGU_GetSystemModel(u8*);
+Handle *pmDbgGetSessionHandle(void); Result cfguInit(void); void cfguExit(void); Result CFGU_GetSystemModel(u8*);
 Result socInit(u32*,u32); Result socExit(void); long gethostid(void);
 Thread threadCreate(ThreadFunc,void*,size_t,int,int,bool); Result threadJoin(Thread,u64); void threadFree(Thread);
 void LightLock_Init(LightLock*); void LightLock_Lock(LightLock*); void LightLock_Unlock(LightLock*);
